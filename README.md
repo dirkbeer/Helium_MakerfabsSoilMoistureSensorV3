@@ -14,28 +14,24 @@ Adapted from <https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
 
 ## Connecting and uploading to the board:
 
-|1. Use EITHER the power output of the USB-TTL converter OR batteries to power the sensor, not both|
-| :- |
-|2. If the USB-TTL converter does not have DTR, you must use the RST button on the sensor to upload a sketch: hold down RST, press upload, wait until the status shows "uploading", immediately release RST|
-|3. If connection does not work, try reversing RX and TX|
-|What worked for me: sensor powered by batteries; converter GND, RX, TX only connected, RX-TX reversed|
+1. Use EITHER the power output of the USB-TTL converter OR batteries to power the sensor, not both
+2. If the USB-TTL converter does not have DTR, you must use the RST button on the sensor to upload a sketch: hold down RST, press upload, wait until the status shows "uploading", immediately release RST
+3. If connection does not work, try reversing RX and TX
+4. What worked for me: sensor powered by batteries; converter GND, RX, TX only connected, RX-TX reversed
 
 ## Software needed:
-* MCCI LoRaWAN LMIC library
-* Lightweight low power library for Arduino
-* AHT10 library (github Makerfabs)
-For original source code and additional information, refer to: <https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
+* MCCI LoRaWAN LMIC library <https://github.com/mcci-catena/arduino-lmic>
+* Lightweight low power library for Arduino <https://github.com/rocketscream/Low-Power>
+* For original source code and additional information, refer to: <https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
 
 ## Helium setup:
-|1. Pay careful attention to the byte order and order of the variables APPEUI, DEVEUI, APPKEY. These are different than what is displayed in the helium console by default|
-| :- |
-|2. The decoder here is provided for reference, it has not been modified to work on the helium console|
+1. Pay careful attention to the byte order and order of the variables APPEUI, DEVEUI, APPKEY. These are different than what is displayed in the helium console by default
+2. The decoder here is provided for reference, it has not been modified to work on the helium console
 
 ## Reference info:
 
-|Classic ATMEL AVR 8-bit Atmega328P, with Arduino Pro Mini(3.3V/8M bootloader pre-loaded) .|
-| :- |
-|AHT10 temperature and humidity sensor.|
-|<https://docs.arduino.cc/retired/getting-started-guides/ArduinoProMini>|
+* ATMEL AVR 8-bit Atmega328P, with Arduino Pro Mini(3.3V/8M bootloader pre-loaded)
+* AHT10 temperature and humidity sensor
+* <https://docs.arduino.cc/retired/getting-started-guides/ArduinoProMini>
 
 
