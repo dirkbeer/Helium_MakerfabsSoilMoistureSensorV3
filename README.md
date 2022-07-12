@@ -1,4 +1,5 @@
 # Helium_MakerfabsSoilMoistureSensorV3
+Adapted from <https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
 
 ## Equipment needed:
 
@@ -20,7 +21,10 @@
 |What worked for me: sensor powered by batteries; converter GND, RX, TX only connected, RX-TX reversed|
 
 ## Software needed:
-For original source code and Arduino libraries needed, refer to: <https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
+* MCCI LoRaWAN LMIC library
+* Lightweight low power library for Arduino
+* AHT10 library (github Makerfabs)
+For original source code and additional information, refer to: <https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
 
 ## Helium setup:
 |1. Pay careful attention to the byte order and order of the variables APPEUI, DEVEUI, APPKEY. These are different than what is displayed in the helium console by default|
