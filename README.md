@@ -20,7 +20,11 @@
 |What worked for me: sensor powered by batteries; converter GND, RX, TX only connected, RX-TX reversed|
 
 ## Software needed:
-<https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
+For original source code and Arduino libraries needed, refer to: <https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
+
+## Helium setup:
+|1. Pay careful attention to the byte order and order of the variables APPEUI, DEVEUI, APPKEY. These are different than what is displayed in the helium console by default|
+|2. The decoder here is provided for reference, it has not been modified to work on the helium console|
 
 ## Reference info:
 
