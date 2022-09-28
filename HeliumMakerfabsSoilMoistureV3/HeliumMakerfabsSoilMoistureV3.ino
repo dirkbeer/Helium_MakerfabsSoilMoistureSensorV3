@@ -410,6 +410,7 @@ void setup() {
     LMIC_reset();
 
     LMIC_setClockError(MAX_CLOCK_ERROR * 1 / 100);
+    LMIC_selectSubBand(1);  # for USA
     // Start job (sending automatically starts OTAA too)
     do_send(&sendjob);
 }
