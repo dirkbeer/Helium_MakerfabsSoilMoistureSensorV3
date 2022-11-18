@@ -1,5 +1,10 @@
 # Helium_MakerfabsSoilMoistureSensorV3
+
 Adapted from <https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
+
+For more recent similar code, see: <https://community.home-assistant.io/t/makerfabs-soil-moisture-sensor-v3-lorawan-ttn-v3-and-ha-integration/446021>
+
+And for a decoder, see <https://gist.github.com/denicola2/79639d7b17bf1b828c7cfeffedee0a13>
 
 ## Equipment needed:
 
