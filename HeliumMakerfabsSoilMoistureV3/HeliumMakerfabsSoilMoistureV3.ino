@@ -47,6 +47,10 @@
 #include <hal/hal.h>
 #include <SPI.h>
 
+# define SKETCH_VERSION "Tamadite: 2022July27_1"
+
+//#define PRINT
+
 AHT10 humiditySensor; 
 
 //
@@ -85,11 +89,12 @@ static osjob_t sendjob;
 
 // Schedule TX every this many seconds (might become longer due to duty
 // cycle limitations).
-const unsigned TX_INTERVAL = 15; //1200;
+const unsigned TX_INTERVAL = 300; //1200;
 
 // sensors pin mapping
 int sensorPin = A2;         // select the input pin for the potentiometer
 int sensorPowerCtrlPin = 5; // select control pin for switching VCC (sensors)
+#define PWM_OUT_PIN 9
 
 // RFM95 pin mapping
 const lmic_pinmap lmic_pins = {
@@ -108,7 +113,7 @@ void sensorPowerOn(void)
 // switch VCC off (sensor off)
 void sensorPowerOff(void)
 {
-  digitalWrite(sensorPowerCtrlPin, LOW);//Sensor power on 
+  digitalWrite(sensorPowerCtrlPin, LOW);//Sensor power off 
 }
 
 void printHex2(unsigned v) {
@@ -120,7 +125,7 @@ void printHex2(unsigned v) {
 
 void onEvent (ev_t ev) {
     Serial.print(os_getTime());
-    Serial.print(": ");
+    Serial.print(F(": "));
     switch(ev) {
         case EV_SCAN_TIMEOUT:
             Serial.println(F("EV_SCAN_TIMEOUT"));
@@ -145,21 +150,21 @@ void onEvent (ev_t ev) {
               u1_t nwkKey[16];
               u1_t artKey[16];
               LMIC_getSessionKeys(&netid, &devaddr, nwkKey, artKey);
-              Serial.print("netid: ");
+              Serial.print(F("netid: "));
               Serial.println(netid, DEC);
-              Serial.print("devaddr: ");
+              Serial.print(F("devaddr: "));
               Serial.println(devaddr, HEX);
-              Serial.print("AppSKey: ");
+              Serial.print(F("AppSKey: "));
               for (size_t i=0; i<sizeof(artKey); ++i) {
                 if (i != 0)
-                  Serial.print("-");
+                  Serial.print(F("-"));
                 printHex2(artKey[i]);
               }
-              Serial.println("");
-              Serial.print("NwkSKey: ");
+              Serial.println(F(""));
+              Serial.print(F("NwkSKey: "));
               for (size_t i=0; i<sizeof(nwkKey); ++i) {
                       if (i != 0)
-                              Serial.print("-");
+                              Serial.print(F("-"));
                       printHex2(nwkKey[i]);
               }
               Serial.println();
@@ -249,14 +254,16 @@ void onEvent (ev_t ev) {
 
 void do_send(osjob_t* j){
 
-float   temperature=0.0;        //temperature
-float   humidity=0.0;           //humidity
+float   temperature = 0.0;      //temperature
+float   humidity = 0.0;         //humidity
 int     soilmoisturepercent=0;  //spoil moisture humidity
-uint8_t payload[8];             //payload for TX
-int     AirValue = 828;         //capacitive sensor in the value (maximum value)
-int     WaterValue = 496;       //capacitive sensor in water value (minimum value)
+uint8_t payload[10];             //payload for TX
+int     AirValue = 880;        //capacitive sensor in the value (maximum value)
+int     WaterValue = 560;       //capacitive sensor in water value (minimum value)
 int     sensorValue = 0;        //capacitive sensor
 int     x = 0;
+int ADC_O_1;           // ADC Output First 8 bits
+int ADC_O_2;           // ADC Output Next 2 bits
 
 
     // Check if there is not a current TX/RX job running
@@ -264,11 +271,53 @@ int     x = 0;
         Serial.println(F("OP_TXRXPEND, not sending"));
     } else {
 
+// ------------------------------
+
+    pinMode(PWM_OUT_PIN, OUTPUT);    //digitalWrite(PWM_OUT_PIN, LOW);
+    TCCR1A = bit(COM1A0);            // toggle OC1A on Compare Match
+    TCCR1B = bit(WGM12) | bit(CS10); // CTC, scale to clock
+    OCR1A = 1;                       // compare A register value (5000 * clock speed / 1024).When OCR1A == 1, PWM is 2MHz
+
+    //ADC2  AVCC as reference voltage
+    ADMUX = _BV(REFS0) | _BV(MUX1);
+
+    //ADC2  internal 1.1V as ADC reference voltage
+    //ADMUX = _BV(REFS1) |_BV(REFS0) | _BV(MUX1);
+
+    // 8  分频
+    ADCSRA = _BV(ADEN) | _BV(ADPS1) | _BV(ADPS0);
+
+// ------------------------------
 
     // read capacitive sensor value
     sensorPowerOn();//
     delay(100);
-    sensorValue = analogRead(sensorPin);
+        for (int i = 0; i < 3; i++)
+    {
+        //start ADC conversion
+        ADCSRA |= (1 << ADSC);
+
+        delay(10);
+
+        if ((ADCSRA & 0x40) == 0)
+        {
+            ADC_O_1 = ADCL;
+            ADC_O_2 = ADCH;
+
+            sensorValue = (ADC_O_2 << 8) + ADC_O_1;
+            ADCSRA |= 0x40;
+#if DEBUG_OUT_ENABLE
+            Serial.print(F("ADC:"));
+            Serial.println(sensorValue);
+#endif
+
+//e            if (readSensorStatus == false)
+//e                readSensorStatus = AHT_init();
+        }
+        ADCSRA |= (1 << ADIF); //reset as required
+        delay(50);
+    }
+//e    sensorValue = analogRead(sensorPin);
     delay(200);
   
 
@@ -313,8 +362,8 @@ int     x = 0;
 	      temperature=0.0;       
 	      humidity=0.0;         
     }
-
     soilmoisturepercent = map(sensorValue, AirValue, WaterValue, 0, 100);
+/*
     if(soilmoisturepercent >= 100)
     {
      soilmoisturepercent=100;
@@ -323,10 +372,12 @@ int     x = 0;
     {
       soilmoisturepercent=0;
     }
+*/    
     
     // measurement completed, power down sensors
     sensorPowerOff();
 
+#ifdef PRINT
     //Print the results
     Serial.print(F("Temperature: "));
     Serial.print(temperature, 2);
@@ -339,9 +390,15 @@ int     x = 0;
     Serial.print(getVDD);
     Serial.println(F("mV \t"));
   
-    Serial.print(F("Moisture ADC : "));
+    Serial.print(F("Moisture ADC  : "));
     Serial.print(soilmoisturepercent);
     Serial.println(F("% \t"));
+
+    Serial.print(F("Moisture (raw): "));
+    Serial.print(sensorValue);
+    Serial.println(F(" \t"));
+
+#endif
 
     // prepare payload for TX
     byte csmLow = lowByte(soilmoisturepercent);
@@ -377,6 +434,13 @@ int     x = 0;
     payload[6] = battLow;
     payload[7] = battHigh;
 
+    // prepare payload for TX
+    byte svLow = lowByte(sensorValue);
+    byte svHigh = highByte(sensorValue);
+    // place the bytes into the payload
+    payload[8] = svLow;
+    payload[9] = svHigh;
+
     // Prepare upstream data transmission at the next possible time.
     LMIC_setTxData2(1, payload, sizeof(payload), 0);
     Serial.println(F("Packet queued"));
@@ -387,6 +451,8 @@ int     x = 0;
 void setup() {
     Serial.begin(9600);
     Serial.println(F("Starting"));
+    Serial.print(F("Sketch version: "));
+    Serial.println(F("SKETCH_VERSION"));
 
     // set control pin for VCC as Output
     pinMode(sensorPowerCtrlPin, OUTPUT);
@@ -408,9 +474,8 @@ void setup() {
     os_init();
     // Reset the MAC state. Session and pending data transfers will be discarded.
     LMIC_reset();
-
+    LMIC_selectSubBand(1);  // for USA
     LMIC_setClockError(MAX_CLOCK_ERROR * 1 / 100);
-    LMIC_selectSubBand(1);  # for USA
     // Start job (sending automatically starts OTAA too)
     do_send(&sendjob);
 }
