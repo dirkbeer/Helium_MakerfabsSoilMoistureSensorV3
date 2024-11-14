@@ -28,8 +28,21 @@ Based on slight adaptation of the code here: <https://community.home-assistant.i
 4. What worked for me: sensor powered by batteries; converter GND, RX, TX only connected, RX-TX reversed
 
 ## Software needed:
+
+* Prolific driver for Windows 11 if using PL2303TA, download the latest from prolific's site:
+
+  https://www.prolific.com.tw/UserFiles/files/PL23XX_Prolific_DriverInstaller_v4300.zip
+
+  Device Manager -> Update Driver -> Browse My Computer -> browse to the unzipped folder -> Let Me Pick -> select the older version of the driver
+  
 * MCCI LoRaWAN LMIC library <https://github.com/mcci-catena/arduino-lmic>
+
+   Sketch -> Include Library -> Manage Libraries -> MCCI LoRaWAN LMIC library@4.1.1
+  
 * Lightweight low power library for Arduino <https://github.com/rocketscream/Low-Power>
+
+  Sketch -> Include Library -> Manage Libraries -> Low-Power@1.81.0
+  
 * For original source code and additional information, refer to: <https://hackaday.io/project/180796-lorawan-soil-moisture-sensor>
 
 ## Helium setup:
