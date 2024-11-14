@@ -9,6 +9,10 @@ Based on slight adaptation of the code here: <https://community.home-assistant.i
 ![image](https://user-images.githubusercontent.com/6425332/202832031-77572130-9884-4070-a9f2-b3e62bcbadda.png)
 
 
+## GristleKing blog post
+
+<https://gristleking.com/how-wet-can-ya-get-lets-get-muddy/>
+
 ## Equipment needed:
 
 |Sensor|<https://www.makerfabs.com/lora-soil-moisture-sensor-v3.html>||
